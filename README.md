@@ -74,3 +74,75 @@ ConferenceRoomBooking/
 | `11111111-1111-1111-1111-111111111111` | Проєктор | 500 |
 | `22222222-2222-2222-2222-222222222222` | Wi-Fi | 300 |
 | `33333333-3333-3333-3333-333333333333` | Звук | 700 |
+
+---
+
+## 🚀 Встановлення та запуск
+
+### Вимоги
+* .NET 8.0 SDK
+* PostgreSQL 14+
+
+### Інструкція з розгортання
+
+1. **Клонуйте репозиторій:**
+   ```bash
+   git clone [https://github.com/](https://github.com/)<your-username>/ConferenceRoomBooking.git
+   cd ConferenceRoomBooking
+   ```
+2. **Налаштуйте з'єднання з базою даних:**
+   У файлі src/ConferenceRoomBooking.Api/appsettings.json відредагуйте параметри доступу до вашої PostgreSQL:
+   ```JSON
+   "ConnectionStrings": {
+      "DefaultConnection": "Host=localhost;Port=5432;Database=ConferenceRoomBookingDb;Username=postgres;Password=your_password"
+   }
+   ```
+3. **Застосуйте міграції:**
+   ```bash
+   dotnet ef database update --project src/ConferenceRoomBooking.Infrastructure --startup-project src/ConferenceRoomBooking.Api
+   ```
+4. **Запустіть бекенд:**
+   ```bash
+   dotnet run --project src/ConferenceRoomBooking.Api
+   ```
+5. **Тестування API:**
+  Відкрийте в браузері Swagger UI: http://localhost:5290/swagger (або порт, вказаний у терміналі під час старту).
+
+---
+
+## 🔌 Огляд API Endpoints
+
+1. **Зали (/api/Halls)**
+   * GET /api/Halls/search?startTime=...&endTime=...&requiredCapacity=... — пошук доступних залів під критерії часу та кількості учасників (зайняті зали автоматично виключаються).
+   * POST /api/Halls — створення нового залу.
+   * PUT /api/Halls/{id} — оновлення параметрів залу та підключення нових послуг.
+   * DELETE /api/Halls/{id} — м'яке видалення залу (встановлення прапорця IsDeleted = true).
+2. **Бронювання (/api/Bookings)**
+   * POST /api/Bookings — створення бронювання з валідацією слотів та розрахунком ціни за формулою тарифних зон.
+   
+   Приклад тіла запиту на бронювання:
+   ```JSON
+   {
+     "hallId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+     "customerName": "Олександр",
+     "customerEmail": "alex@example.com",
+     "startTime": "2026-10-01T11:00:00Z",
+     "endTime": "2026-10-01T14:00:00Z",
+     "selectedServiceIds": [
+       "11111111-1111-1111-1111-111111111111"
+      ]
+   }
+   ```
+3. **Аналітика та звіти (/api/Reports)**
+   * GET /api/Reports/occupancy?fromUtc=...&toUtc=... — процентний коефіцієнт та кількість заброньованих годин залів.
+   * GET /api/Reports/revenue?fromUtc=...&toUtc=... — фінансовий звіт: виручка з оренди, виручка з послуг, середній чек.
+   * GET /api/Reports/popular-services?fromUtc=...&toUtc=... — аналітика замовлення супутніх послуг.
+---
+
+## 🛠 Технологічний стек
+* Платформа: C# 12 / .NET 8
+* База даних: PostgreSQL
+* ORM: Entity Framework Core (Npgsql)
+* Документація: Swagger / OpenAPI
+* Стандарти помилок: RFC 7807 (Problem Details)
+* Підхід до архітектури: Clean Architecture, Domain-Driven Design, Repository & Unit of Work Patterns
