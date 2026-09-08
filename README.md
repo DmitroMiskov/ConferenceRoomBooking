@@ -57,3 +57,5 @@ ConferenceRoomBooking/
 │       ├── Middleware/                         # GlobalExceptionHandler (RFC 7807 Problem Details)
 │       └── Program.cs                          # Конфігурація DI-контейнера та пайплайну
 └── README.md
+```text
+## Початкові дані (Database Seeding)
